@@ -1,5 +1,7 @@
+@import url('https://rsms.me/inter/inter.css');
 @import "tailwindcss";
 @import "tw-animate-css";
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -114,7 +116,35 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+input[type="text"]::placeholder {
+  letter-spacing: 0.5em;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 6s infinite ease-in-out;
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.98);
+  }
+
+  50% {
+    opacity: 0.25;
+    transform: scale(1.02);
+  }
+}
+
+.animation-delay-2000 {
+  animation-delay: 3s;
+  /* Aumentei o delay para diferenciar mais as animações */
 }

@@ -1,15 +1,17 @@
 import * as React from "react"
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
   Command,
   Frame,
   GalleryVerticalEnd,
+  HandCoins,
+  LayoutDashboard,
   Map,
+  PackageOpen,
   PieChart,
-  Settings2,
-  SquareTerminal,
+  SquareScissors,
+  UserRoundCog,
+  Users2,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -27,11 +29,11 @@ import {
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "Jorge William",
+    email: "jorge_william_cardoso@yahoo.com.br",
     avatar: "/avatars/shadcn.jpg",
   },
-  teams: [
+  filiais: [
     {
       name: "Acme Inc",
       logo: GalleryVerticalEnd,
@@ -50,89 +52,55 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
+      title: "Dashboard",
+      url: "/",
+      icon: LayoutDashboard,
       isActive: true,
+    },
+    {
+      title: "Fila de Espera",
+      url: "/fila-de-espera",
+      icon: Users2,
+    },
+    {
+      title: "Vendas",
+      url: "#",
+      icon: HandCoins,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Nova transação",
+          url: "/vendas/nova-transacao",
+          icon: HandCoins,
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Reembolso",
+          url: "/vendas/reembolso",
         },
         {
-          title: "Settings",
+          title: "Histórico",
+          url: "/vendas/historico",
+          icon: LayoutDashboard,
+        },
+        {
+          title: "Comanda",
           url: "#",
         },
       ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
+      title: "Estoque",
+      url: "/estoque",
+      icon: PackageOpen,
     },
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      title: "Clientes",
+      url: "/clientes",
+      icon: UserRoundCog,
     },
     {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
+      title: "Staff",
+      url: "/staff",
+      icon: SquareScissors,
     },
   ],
   projects: [
@@ -154,11 +122,11 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar( { ...props }: React.ComponentProps<typeof Sidebar> ) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={data.filiais} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
