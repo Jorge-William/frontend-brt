@@ -84,8 +84,15 @@ export default function CriarContaPage() {
         console.error( result.message );
       } else {
         console.log( 'Usuário criado com sucesso!' );
-        navigate( '/verificar-codigo', {
-          state: { email: data.email }
+        navigate( '/verificar-codigo', { 
+          state: { 
+            email: data.email,
+            userData: {
+              firstName: data.fullName.split(' ')[0],
+              lastName: data.fullName.split(' ').slice(1).join(' '),
+              cellphone: data.phone
+            }
+          } 
         } );
       }
     } catch ( error ) {

@@ -5,6 +5,7 @@ import ClientesPage from './pages/clientes/clientes.page'
 import NovaTransacaoPage from './pages/vendas/nova-transacao.page'
 import CriarContaPage from './pages/onboarding/criando-conta.page'
 import VerificarCodigoPage from './pages/onboarding/verificar-codigo.page'
+import PaymentPage from './pages/checkout/payment.page';
 import { Toaster } from 'sonner';
 
 function App() {
@@ -24,9 +25,11 @@ function App() {
         <Route path="/estoque" element={<div>Estoque Page</div>} />
         <Route path="/staff" element={<div>Staff Page</div>} />
         <Route path="/design-engineering" element={<div>Design Engineering Page</div>} />
+        <Route path="/checkout/payment" element={<PaymentPage />} />
       </Routes>
     </BrowserRouter>
   )
 }
 
 export default App
+

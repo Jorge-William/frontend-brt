@@ -35,7 +35,7 @@ interface IResendCodeRequest {
 
 const resendVerificationCode = async (data: IResendCodeRequest): Promise<void | Error> => {
   try {
-    await api.post('/tenants/resend-verification', { email: data.email });
+    await api.post('/tenants/resend-code', { email: data.email });
   } catch (error) {
     console.error('Error resending verification code:', error);
     return new Error((error as { message: string }).message || 'Erro ao reenviar código.');
