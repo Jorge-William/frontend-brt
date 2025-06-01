@@ -7,6 +7,7 @@ import CriarContaPage from './pages/onboarding/criando-conta.page'
 import VerificarCodigoPage from './pages/onboarding/verificar-codigo.page'
 import PaymentPage from './pages/checkout/payment.page';
 import { Toaster } from 'sonner';
+import ConfigBarbearia from './pages/onboarding/barbershop-setup/config-barbearia.page'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/staff" element={<div>Staff Page</div>} />
         <Route path="/design-engineering" element={<div>Design Engineering Page</div>} />
         <Route path="/checkout/payment" element={<PaymentPage />} />
+        <Route path="/onboarding/barbershop-setup" element={<ConfigBarbearia />} />
       </Routes>
     </BrowserRouter>
   )
