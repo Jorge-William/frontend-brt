@@ -1,22 +1,22 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { PageHeader } from "@/components/page-header"
-import { Badge } from "@/components/ui/badge"
+import { AppSidebar } from "@/components/app-sidebar";
+import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { PageHeader } from "@/components/page-header";
+import { Badge } from "@/components/ui/badge";
 import {
   TrendingUpIcon,
   Users2Icon,
   UserPlusIcon,
-  UserMinusIcon
-} from "lucide-react"
+  UserMinusIcon,
+} from "lucide-react";
 
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter
-} from "@/components/ui/card"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+  CardFooter,
+} from "@/components/ui/card";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function ClientesPage() {
   return (
@@ -49,7 +49,10 @@ export default function ClientesPage() {
                   $1,250.00
                 </CardTitle>
                 <div className="absolute right-4 top-4">
-                  <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
+                  <Badge
+                    variant="outline"
+                    className="flex gap-1 rounded-lg text-xs"
+                  >
                     <TrendingUpIcon className="size-3" />
                     +12.5%
                   </Badge>
@@ -73,7 +76,10 @@ export default function ClientesPage() {
                   1,234
                 </CardTitle>
                 <div className="absolute right-4 top-4">
-                  <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
+                  <Badge
+                    variant="outline"
+                    className="flex gap-1 rounded-lg text-xs"
+                  >
                     <Users2Icon className="size-3" />
                     Total
                   </Badge>
@@ -97,7 +103,10 @@ export default function ClientesPage() {
                   56
                 </CardTitle>
                 <div className="absolute right-4 top-4">
-                  <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
+                  <Badge
+                    variant="outline"
+                    className="flex gap-1 rounded-lg text-xs"
+                  >
                     <UserPlusIcon className="size-3" />
                     +8.3%
                   </Badge>
@@ -121,7 +130,10 @@ export default function ClientesPage() {
                   2.4%
                 </CardTitle>
                 <div className="absolute right-4 top-4">
-                  <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
+                  <Badge
+                    variant="outline"
+                    className="flex gap-1 rounded-lg text-xs"
+                  >
                     <UserMinusIcon className="size-3" />
                     -1.2%
                   </Badge>
@@ -143,6 +155,6 @@ export default function ClientesPage() {
         </div>
         <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
       </SidebarInset>
-    </SidebarProvider >
-  )
+    </SidebarProvider>
+  );
 }

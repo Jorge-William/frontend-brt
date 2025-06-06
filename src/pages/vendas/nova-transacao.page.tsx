@@ -1,7 +1,7 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { PageHeader } from "@/components/page-header"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { AppSidebar } from "@/components/app-sidebar";
+import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -9,52 +9,52 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form" // <-- Update this path if the file is located elsewhere, e.g. "@/components/form" or "@/components/form/ui"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form"; // <-- Update this path if the file is located elsewhere, e.g. "@/components/form" or "@/components/form/ui"
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+} from "@/components/ui/select";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 // Define form schema with validation rules
-const formSchema = z.object( {
-  cliente: z.string( {
+const formSchema = z.object({
+  cliente: z.string({
     required_error: "Por favor selecione um cliente",
-  } ),
-  servico: z.string( {
+  }),
+  servico: z.string({
     required_error: "Por favor selecione um serviço",
-  } ),
-  valor: z.string().min( 1, "Por favor digite o valor" ),
-  pagamento: z.enum( [ "dinheiro", "debito", "credito", "pix" ], {
+  }),
+  valor: z.string().min(1, "Por favor digite o valor"),
+  pagamento: z.enum(["dinheiro", "debito", "credito", "pix"], {
     required_error: "Por favor selecione o método de pagamento",
-  } ),
-} )
+  }),
+});
 
 // Type inference from schema
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 export default function NovaTransacaoPage() {
   // Initialize form with validation schema
-  const form = useForm<FormValues>( {
-    resolver: zodResolver( formSchema ),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       cliente: "",
       servico: "",
       valor: "",
       pagamento: undefined,
     },
-  } )
+  });
 
   // Form submission handler
-  function onSubmit( data: FormValues ) {
-    console.log( "Form submitted:", data )
+  function onSubmit(data: FormValues) {
+    console.log("Form submitted:", data);
     // TODO: Implement API call
   }
 
@@ -78,15 +78,21 @@ export default function NovaTransacaoPage() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit( onSubmit )} className="space-y-6">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   {/* Cliente Select Field */}
                   <FormField
                     control={form.control}
                     name="cliente"
-                    render={( { field } ) => (
+                    render={({ field }) => (
                       <FormItem>
                         <FormLabel>Cliente</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione um cliente" />
@@ -106,19 +112,26 @@ export default function NovaTransacaoPage() {
                   <FormField
                     control={form.control}
                     name="servico"
-                    render={( { field } ) => (
+                    render={({ field }) => (
                       <FormItem>
                         <FormLabel>Serviço</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione um serviço" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="corte">Corte de Cabelo</SelectItem>
+                            <SelectItem value="corte">
+                              Corte de Cabelo
+                            </SelectItem>
                             <SelectItem value="barba">Barba</SelectItem>
-                            <SelectItem value="combo">Combo (Corte + Barba)</SelectItem>
+                            <SelectItem value="combo">
+                              Combo (Corte + Barba)
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -130,7 +143,7 @@ export default function NovaTransacaoPage() {
                   <FormField
                     control={form.control}
                     name="valor"
-                    render={( { field } ) => (
+                    render={({ field }) => (
                       <FormItem>
                         <FormLabel>Valor</FormLabel>
                         <FormControl>
@@ -150,10 +163,13 @@ export default function NovaTransacaoPage() {
                   <FormField
                     control={form.control}
                     name="pagamento"
-                    render={( { field } ) => (
+                    render={({ field }) => (
                       <FormItem>
                         <FormLabel>Método de Pagamento</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione o método" />
@@ -161,8 +177,12 @@ export default function NovaTransacaoPage() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                            <SelectItem value="debito">Cartão de Débito</SelectItem>
-                            <SelectItem value="credito">Cartão de Crédito</SelectItem>
+                            <SelectItem value="debito">
+                              Cartão de Débito
+                            </SelectItem>
+                            <SelectItem value="credito">
+                              Cartão de Crédito
+                            </SelectItem>
                             <SelectItem value="pix">PIX</SelectItem>
                           </SelectContent>
                         </Select>
@@ -181,5 +201,5 @@ export default function NovaTransacaoPage() {
         </main>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

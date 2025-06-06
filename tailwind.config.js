@@ -1,4 +1,4 @@
-import { fontFamily } from "tailwindcss/defaultTheme"
+import { fontFamily } from "tailwindcss/defaultTheme";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -8,5 +8,5 @@ export default {
         sans: ["Inter var", ...fontFamily.sans],
       },
     },
-  }
-}
+  },
+};

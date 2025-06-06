@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { Loader2, CreditCard, Check } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Loader2, CreditCard, Check } from "lucide-react";
+import { toast } from "sonner";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,9 +14,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -24,38 +24,42 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import Logo from '@/assets/logos/5.svg';
-import { plans } from '@/config/plans';
-import { normalizeCardNumber, normalizeExpiryDate } from '@/utils/masks';
+} from "@/components/ui/select";
+import Logo from "@/assets/logos/5.svg";
+import { plans } from "@/config/plans";
+import { normalizeCardNumber, normalizeExpiryDate } from "@/utils/masks";
+import OnboardingStore from "@/stores/OnboardingStore";
 
 // Validation schema
 const paymentSchema = z.object( {
-  cardNumber: z.string()
+  cardNumber: z
+    .string()
     .min( 19, { message: "Número do cartão inválido" } )
     .max( 19, { message: "Número do cartão inválido" } )
     .regex( /^(\d{4}\s){3}\d{4}$/, { message: "Formato inválido" } )
-    .transform( val => val.replace( /\s/g, '' ) ), // Remove espaços antes de enviar
-  cardExpiry: z.string()
+    .transform( ( val ) => val.replace( /\s/g, "" ) ), // Remove espaços antes de enviar
+  cardExpiry: z
+    .string()
     .regex( /^(0[1-9]|1[0-2])\/([0-9]{2})$/, {
-      message: "Data de expiração inválida (MM/YY)"
+      message: "Data de expiração inválida (MM/YY)",
     } )
-    .refine( ( val ) => {
-      const [ month, year ] = val.split( '/' );
-      const expiry = new Date( 2000 + parseInt( year ), parseInt( month ) - 1 );
-      return expiry > new Date();
-    }, {
-      message: "Cartão expirado"
-    } ),
-  cardCvc: z.string()
-    .length( 3, { message: "CVC inválido" } ),
-  cardHolder: z.string()
-    .min( 3, { message: "Nome do titular é obrigatório" } )
+    .refine(
+      ( val ) => {
+        const [ month, year ] = val.split( "/" );
+        const expiry = new Date( 2000 + parseInt( year ), parseInt( month ) - 1 );
+        return expiry > new Date();
+      },
+      {
+        message: "Cartão expirado",
+      },
+    ),
+  cardCvc: z.string().length( 3, { message: "CVC inválido" } ),
+  cardHolder: z.string().min( 3, { message: "Nome do titular é obrigatório" } ),
 } );
 
 type PaymentFormValues = z.infer<typeof paymentSchema>;
 
-const PaymentPage = () => {
+const PagamentoPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -64,10 +68,10 @@ const PaymentPage = () => {
   const [ isPageLoading, setIsPageLoading ] = useState( true );
   const [ selectedPlan, setSelectedPlan ] = useState( () => {
     const planId = location.state?.planId;
-    return plans.find( p => p.id === planId ) || plans[ 0 ];
+    return plans.find( ( p ) => p.id === planId ) || plans[ 0 ];
   } );
 
-  const userData = location.state?.userData;
+  const userData = OnboardingStore.userData;
 
   const {
     register,
@@ -77,66 +81,49 @@ const PaymentPage = () => {
     formState: { errors, isValid },
   } = useForm<PaymentFormValues>( {
     resolver: zodResolver( paymentSchema ),
-    mode: 'onChange'
+    mode: "onChange",
   } );
 
   // Watch card number and expiry for formatting
-  const cardNumber = watch( 'cardNumber' );
-  const cardExpiry = watch( 'cardExpiry' );
+  const cardNumber = watch( "cardNumber" );
+  const cardExpiry = watch( "cardExpiry" );
 
   // Format card number as user types
   useEffect( () => {
-    setValue( 'cardNumber', normalizeCardNumber( cardNumber ) );
+    setValue( "cardNumber", normalizeCardNumber( cardNumber ) );
   }, [ cardNumber, setValue ] );
 
   // Format expiry date as user types
   useEffect( () => {
-    setValue( 'cardExpiry', normalizeExpiryDate( cardExpiry ) );
+    setValue( "cardExpiry", normalizeExpiryDate( cardExpiry ) );
   }, [ cardExpiry, setValue ] );
 
-  const onSubmit = async ( data: PaymentFormValues ) => {
+  const onSubmit = async () => {
     if ( isLoading ) return;
 
     setIsLoading( true );
     try {
       // Verificação mais específica
-      if ( !location.state?.userData ) {
-        throw new Error( 'Dados do usuário não encontrados' );
-      }
 
-      const paymentData = {
-        ...data,
-        planId: selectedPlan.id,
-        amount: selectedPlan.price,
-        userId: location.state.userData.id // Acesso mais seguro
-      };
+      // Após sucesso no pagamento
+      toast.success( "Pagamento realizado com sucesso!", {
+        description: "Você será redirecionado para a tela de boas vindas.",
+      } );
 
-      // Simula chamada à API
-      try {
-        await new Promise( resolve => setTimeout( resolve, 2000 ) );
+      // Redireciona para dashboard ao invés de '/'
+      navigate( "/onboarding/barbershop-setup" );
 
-        // Após sucesso no pagamento
-        toast.success( 'Pagamento realizado com sucesso!', {
-          description: 'Você será redirecionado para o dashboard.'
-        } );
-
-        // Redireciona para dashboard ao invés de '/'
-        navigate( '/' );
-      } catch ( error ) {
-        console.log( 'Erro ao processar pagamento:', error );
-
-        throw new Error( 'Falha no processamento do pagamento' );
-      }
     } catch ( error ) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-      toast.error( 'Erro ao processar pagamento', {
-        description: errorMessage
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
+      toast.error( "Erro ao processar pagamento", {
+        description: errorMessage,
       } );
 
       // Se for erro de sessão, redireciona
-      if ( errorMessage === 'Sessão expirada' ) {
-        navigate( '/onboarding' );
-      }
+      // if ( errorMessage === "Sessão expirada" ) {
+      //   navigate( "/onboarding/" );
+      // }
     } finally {
       setIsLoading( false );
     }
@@ -144,25 +131,24 @@ const PaymentPage = () => {
 
   // Redirect if no user data
   useEffect( () => {
-    if ( !userData ) {
-      toast.error( 'Dados do usuário não encontrados' );
-      navigate( '/onboarding' );
+    if ( !OnboardingStore.userData.email ) {
+      toast.error( "Dados do usuário não encontrados" );
+      navigate( "/onboarding" );
     }
   }, [ userData, navigate ] );
 
   useEffect( () => {
-    if ( !location.state ) {
-      toast.error( 'Acesso inválido' );
-      navigate( '/onboarding' );
+    if ( OnboardingStore.userData.email === "" ) {
+      toast.error( "Acesso inválido" );
+      navigate( "/onboarding" );
       return;
     }
   }, [ location.state, navigate ] );
 
   useEffect( () => {
     const checkAccess = () => {
-      if ( !location.state?.userData ) {
-        toast.error( 'Acesso inválido' );
-        navigate( '/onboarding' );
+      if ( OnboardingStore.userData.email === "" ) {
+        toast.error( "Acesso inválido" );
         return false;
       }
       return true;
@@ -177,25 +163,18 @@ const PaymentPage = () => {
   const handlePlanChange = ( value: string ) => {
     if ( isLoading ) return;
 
-    const newPlan = plans.find( p => p.id === value ) || plans[ 0 ];
+    const newPlan = plans.find( ( p ) => p.id === value ) || plans[ 0 ];
     if ( selectedPlan.price !== newPlan.price ) {
-      toast.info(
-        `Alterando para plano ${newPlan.name}`,
-        {
-          description: `Novo valor: ${new Intl.NumberFormat( 'pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-          } ).format( newPlan.price )}/mês`
-        }
-      );
+      toast.info( `Alterando para plano ${newPlan.name}`, {
+        description: `Novo valor: ${new Intl.NumberFormat( "pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        } ).format( newPlan.price )}/mês`,
+      } );
       setSelectedPlan( newPlan );
     }
   };
 
-  useEffect( () => {
-    console.log( 'Location State:', location.state );
-    console.log( 'User Data:', userData );
-  }, [ location.state, userData ] );
 
   if ( isPageLoading ) {
     return (
@@ -241,9 +220,13 @@ const PaymentPage = () => {
                 <div
                   key={plan.id}
                   className={`relative flex items-center space-x-2 rounded-lg border p-4 shadow-sm transition-colors 
-                    ${selectedPlan.id === plan.id ? 'border-primary bg-primary/5' : 'border-muted'}`}
+                    ${selectedPlan.id === plan.id ? "border-primary bg-primary/5" : "border-muted"}`}
                 >
-                  <RadioGroupItem value={plan.id} id={plan.id} className="peer sr-only" />
+                  <RadioGroupItem
+                    value={plan.id}
+                    id={plan.id}
+                    className="peer sr-only"
+                  />
                   <div className="flex-1">
                     <label
                       htmlFor={plan.id}
@@ -251,12 +234,15 @@ const PaymentPage = () => {
                     >
                       {plan.name}
                     </label>
-                    <p className="text-sm text-muted-foreground">{plan.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {plan.description}
+                    </p>
                     <p className="mt-1.5 text-lg font-semibold text-primary">
-                      {new Intl.NumberFormat( 'pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      } ).format( plan.price )}/mês
+                      {new Intl.NumberFormat( "pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      } ).format( plan.price )}
+                      /mês
                     </p>
                     <ul className="mt-2 text-sm text-muted-foreground">
                       {plan.features.map( ( feature, i ) => (
@@ -279,9 +265,10 @@ const PaymentPage = () => {
         <CardHeader>
           <CardTitle>Informações de Pagamento</CardTitle>
           <CardDescription>
-            Total a pagar: {new Intl.NumberFormat( 'pt-BR', {
-              style: 'currency',
-              currency: 'BRL'
+            Total a pagar:{" "}
+            {new Intl.NumberFormat( "pt-BR", {
+              style: "currency",
+              currency: "BRL",
             } ).format( selectedPlan.price )}
           </CardDescription>
         </CardHeader>
@@ -295,7 +282,10 @@ const PaymentPage = () => {
                 </p>
                 <ul className="mt-2 space-y-1">
                   {selectedPlan.features.map( ( feature, i ) => (
-                    <li key={i} className="text-xs text-muted-foreground flex items-center">
+                    <li
+                      key={i}
+                      className="text-xs text-muted-foreground flex items-center"
+                    >
                       <Check className="mr-1 h-3 w-3 text-primary" />
                       {feature}
                     </li>
@@ -303,18 +293,17 @@ const PaymentPage = () => {
                 </ul>
               </div>
               <p className="text-lg font-semibold text-primary">
-                {new Intl.NumberFormat( 'pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL'
-                } ).format( selectedPlan.price )}/mês
+                {new Intl.NumberFormat( "pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                } ).format( selectedPlan.price )}
+                /mês
               </p>
             </div>
 
             <div className="mt-4 pt-4 border-t">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  Alterar plano
-                </p>
+                <p className="text-sm text-muted-foreground">Alterar plano</p>
                 <Select
                   value={selectedPlan.id}
                   onValueChange={handlePlanChange}
@@ -332,10 +321,11 @@ const PaymentPage = () => {
                       >
                         <span>{plan.name}</span>
                         <span className="text-xs text-muted-foreground ml-2">
-                          {new Intl.NumberFormat( 'pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL'
-                          } ).format( plan.price )}/mês
+                          {new Intl.NumberFormat( "pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          } ).format( plan.price )}
+                          /mês
                         </span>
                       </SelectItem>
                     ) )}
@@ -352,7 +342,7 @@ const PaymentPage = () => {
                 <Input
                   id="cardNumber"
                   placeholder="1234 5678 9012 3456"
-                  {...register( 'cardNumber' )}
+                  {...register( "cardNumber" )}
                   maxLength={19}
                   className="font-mono tracking-wider"
                   autoComplete="cc-number"
@@ -365,7 +355,9 @@ const PaymentPage = () => {
                   }}
                 />
                 {errors.cardNumber && (
-                  <p className="text-xs text-red-600">{errors.cardNumber.message}</p>
+                  <p className="text-xs text-red-600">
+                    {errors.cardNumber.message}
+                  </p>
                 )}
               </div>
 
@@ -375,14 +367,16 @@ const PaymentPage = () => {
                   <Input
                     id="cardExpiry"
                     placeholder="MM/YY"
-                    {...register( 'cardExpiry' )}
+                    {...register( "cardExpiry" )}
                     maxLength={5}
                     autoComplete="cc-exp"
                     inputMode="numeric"
                     disabled={isLoading}
                   />
                   {errors.cardExpiry && (
-                    <p className="text-xs text-red-600">{errors.cardExpiry.message}</p>
+                    <p className="text-xs text-red-600">
+                      {errors.cardExpiry.message}
+                    </p>
                   )}
                 </div>
 
@@ -391,7 +385,7 @@ const PaymentPage = () => {
                   <Input
                     id="cardCvc"
                     placeholder="123"
-                    {...register( 'cardCvc' )}
+                    {...register( "cardCvc" )}
                     maxLength={3}
                     type="password"
                     autoComplete="cc-csc"
@@ -399,7 +393,9 @@ const PaymentPage = () => {
                     disabled={isLoading}
                   />
                   {errors.cardCvc && (
-                    <p className="text-xs text-red-600">{errors.cardCvc.message}</p>
+                    <p className="text-xs text-red-600">
+                      {errors.cardCvc.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -409,12 +405,14 @@ const PaymentPage = () => {
                 <Input
                   id="cardHolder"
                   placeholder="Nome como aparece no cartão"
-                  {...register( 'cardHolder' )}
+                  {...register( "cardHolder" )}
                   autoComplete="cc-name"
                   disabled={isLoading}
                 />
                 {errors.cardHolder && (
-                  <p className="text-xs text-red-600">{errors.cardHolder.message}</p>
+                  <p className="text-xs text-red-600">
+                    {errors.cardHolder.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -432,9 +430,9 @@ const PaymentPage = () => {
               ) : (
                 <>
                   <CreditCard className="mr-2 h-4 w-4" />
-                  {`Pagar ${new Intl.NumberFormat( 'pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
+                  {`Pagar ${new Intl.NumberFormat( "pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
                   } ).format( selectedPlan.price )}`}
                 </>
               )}
@@ -450,6 +448,6 @@ const PaymentPage = () => {
       </Card>
     </div>
   );
-}
+};
 
-export default PaymentPage;
+export default PagamentoPage;

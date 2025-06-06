@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Loader2 } from 'lucide-react';
-import { UsersService } from '@/services/users/users-service';
-import { toast } from 'sonner';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Loader2 } from "lucide-react";
+import { UsersService } from "@/services/users/users-service";
+import { toast } from "sonner";
+import { observer } from "mobx-react-lite";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,27 +16,26 @@ import {
   // CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp"
-import Logo from '@/assets/logos/5.svg';
+} from "@/components/ui/input-otp";
+import Logo from "@/assets/logos/5.svg";
+import OnboardingStore from "@/stores/OnboardingStore";
 
 const verificationSchema = z.object( {
-  code: z.string().length( 6, { message: "O código deve ter 6 dígitos" } )
+  code: z.string().length( 6, { message: "O código deve ter 6 dígitos" } ),
 } );
 
 type VerificationFormValues = z.infer<typeof verificationSchema>;
 
 // const EXPIRATION_TIME = 5 * 60; // 5 minutes in seconds
 
-export default function VerificarCodigoPage() {
+const VerificarCodigoPage = observer( () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const email = location.state?.email;
-  const userData = location.state?.userData;
+  const userStore = OnboardingStore;
 
   const [ isLoading, setIsLoading ] = useState( false );
   const [ timeLeft, setTimeLeft ] = useState( 30 ); // Reduzido para 30 segundos
@@ -45,9 +45,9 @@ export default function VerificarCodigoPage() {
   const {
     handleSubmit,
     formState: { errors },
-    setValue
+    setValue,
   } = useForm<VerificationFormValues>( {
-    resolver: zodResolver( verificationSchema )
+    resolver: zodResolver( verificationSchema ),
   } );
 
   // Timer countdown
@@ -58,7 +58,7 @@ export default function VerificarCodigoPage() {
     }
 
     const timer = setInterval( () => {
-      setTimeLeft( prev => prev - 1 );
+      setTimeLeft( ( prev ) => prev - 1 );
     }, 1000 );
 
     return () => clearInterval( timer );
@@ -71,15 +71,15 @@ export default function VerificarCodigoPage() {
 
   // Redirect if no email in state
   useEffect( () => {
-    if ( !email ) {
-      navigate( '/onboarding' );
+    if ( !userStore.userData?.email ) {
+      navigate( "/onboarding/novo-usuario" );
     }
-  }, [ email, navigate ] );
+  }, [ userStore.userData, navigate ] );
 
   // Atualiza o valor do código quando o InputOTP muda
   const handleCodeChange = ( value: string ) => {
     setCode( value );
-    setValue( 'code', value );
+    setValue( "code", value );
   };
 
   const onSubmit = async () => {
@@ -88,54 +88,52 @@ export default function VerificarCodigoPage() {
     setIsLoading( true );
     try {
       const result = await UsersService.verifyEmail( {
-        email,
-        code: code // Usa o estado do código ao invés do valor do form
+        email: userStore.userData?.email as string,
+        code: code, // Usa o estado do código ao invés do valor do form
       } );
 
       if ( result instanceof Error ) {
-        toast.error( 'Código inválido' );
+        toast.error( "Código inválido" );
       } else {
-        toast.success( 'Email verificado com sucesso!' );
-        navigate( '/checkout/payment', {
-          state: {
-            userData
-          }
-        } );
+        toast.success( "Email verificado com sucesso!" );
+        navigate( "/onboarding/assinatura" );
       }
     } catch ( error ) {
-      console.error( 'Error verifying code:', error );
-      toast.error( 'Erro ao verificar código' );
+      console.error( "Error verifying code:", error );
+      toast.error( "Erro ao verificar código" );
     } finally {
       setIsLoading( false );
     }
   };
 
   const handleResendCode = async () => {
-    if ( !email || !canResend ) return;
+    if ( !userStore.userData?.email || !canResend ) return;
 
     setIsLoading( true );
     try {
-      const result = await UsersService.resendVerificationCode( { email } );
+      const result = await UsersService.resendVerificationCode( {
+        email: userStore.userData.email,
+      } );
 
       if ( result instanceof Error ) {
-        toast.error( 'Erro ao reenviar código', {
-          description: result.message
+        toast.error( "Erro ao reenviar código", {
+          description: result.message,
         } );
       } else {
         // Reseta o código atual
-        setCode( '' );
+        setCode( "" );
         // Reseta o timer
         setTimeLeft( 30 );
         setCanResend( false );
-        toast.success( 'Novo código enviado!', {
-          description: `Verifique sua caixa de entrada: ${email}`
+        toast.success( "Novo código enviado!", {
+          description: `Verifique sua caixa de entrada: ${userStore.userData.email}`,
         } );
       }
     } catch ( error ) {
-      console.log( 'Error resending code:', error );
+      console.log( "Error resending code:", error );
 
-      toast.error( 'Erro ao reenviar código', {
-        description: 'Tente novamente em alguns instantes'
+      toast.error( "Erro ao reenviar código", {
+        description: "Tente novamente em alguns instantes",
       } );
     } finally {
       setIsLoading( false );
@@ -158,7 +156,8 @@ export default function VerificarCodigoPage() {
         <CardHeader className="text-center">
           <CardTitle>Verificação de Email</CardTitle>
           <CardDescription>
-            Digite o código de verificação enviado para {email}
+            Digite o código de verificação enviado para{" "}
+            {userStore.userData?.email}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -191,14 +190,14 @@ export default function VerificarCodigoPage() {
                   )}
                 />
                 {errors.code && (
-                  <p className="text-xs text-red-600 mt-2">{errors.code.message}</p>
+                  <p className="text-xs text-red-600 mt-2">
+                    {errors.code.message}
+                  </p>
                 )}
               </div>
 
               <div className="text-center space-y-2">
-                <p className="text-sm text-gray-500">
-                  Não recebeu o código?
-                </p>
+                <p className="text-sm text-gray-500">Não recebeu o código?</p>
                 {canResend ? (
                   <Button
                     variant="ghost"
@@ -228,7 +227,7 @@ export default function VerificarCodigoPage() {
                   Verificando...
                 </>
               ) : (
-                'Verificar'
+                "Verificar"
               )}
             </Button>
           </form>
@@ -236,4 +235,6 @@ export default function VerificarCodigoPage() {
       </Card>
     </div>
   );
-}
+} );
+
+export default VerificarCodigoPage;

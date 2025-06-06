@@ -1,18 +1,13 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { PageHeader } from "@/components/page-header"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar";
+import { PageHeader } from "@/components/page-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function DashboardPage() {
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <PageHeader
-          breadcrumbs={[ { title: "Dashboard", href: "/" } ]}
-        />
+        <PageHeader breadcrumbs={[{ title: "Dashboard", href: "/" }]} />
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <h1>teste</h1>
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
@@ -24,5 +19,5 @@ export default function DashboardPage() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

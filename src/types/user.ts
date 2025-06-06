@@ -6,10 +6,10 @@ export interface IUser {
   cellphone: string;
 }
 
-export interface IUserCreate extends Omit<IUser, 'id'> {
+export interface IUserCreate {
   email: string;
   firstName: string;
   lastName: string;
   password: string;
-  cellphone: string;              
+  cellphone: string;
 }
